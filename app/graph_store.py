@@ -11,7 +11,7 @@ import os
 import threading
 from rdflib import Graph, Namespace, RDF, XSD, Literal, URIRef
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ONTOLOGY_PATH = os.path.join(BASE_DIR, "ontology", "academic.ttl")
 DATA_PATH = os.path.join(BASE_DIR, "data", "instances.ttl")
 
@@ -37,7 +37,6 @@ class GraphStore:
         instance_graph = Graph()
         instance_graph.bind("academic", ACAD)
 
-        # Re-serializa apenas os triplos cujo sujeito não pertence à definição da ontologia
         ontology_graph = Graph()
         ontology_graph.parse(ONTOLOGY_PATH, format="turtle")
         ontology_subjects = set(ontology_graph.subjects())
@@ -229,7 +228,6 @@ class GraphStore:
         if (uc_uri, RDF.type, ACAD.UnidadeCurricular) not in self.graph:
             raise ValueError("UC não encontrada")
 
-        # gera um id incremental simples para a avaliação
         existing = list(self.graph.subjects(RDF.type, ACAD.Avaliacao))
         novo_id = len(existing) + 1
         aval_uri = ACAD[f"Avaliacao_{novo_id:03d}"]
