@@ -1,0 +1,216 @@
+@prefix : <http://exemplo.org/academia#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================
+# DEPARTAMENTOS (2)
+# ============================================
+:DEI a :Departamento ;
+    :temSigla "DEI" ;
+    rdfs:label "Departamento de Engenharia Informática" .
+
+:DEM a :Departamento ;
+    :temSigla "DEM" ;
+    rdfs:label "Departamento de Engenharia Mecânica" .
+
+# ============================================
+# CURSOS (2)
+# ============================================
+:CursoInformatica a :Curso ;
+    :temNomeCurso "Licenciatura em Ciências da Computação" ;
+    :pertenceDepartamento :DEI .
+
+:CursoMecanica a :Curso ;
+    :temNomeCurso "Licenciatura em Engenharia Mecânica" ;
+    :pertenceDepartamento :DEM .
+
+# ============================================
+# DISCIPLINAS (6) - com cadeia de pré-requisitos
+# ============================================
+:BDI a :Disciplina ;
+    :temCodigo "INF101" ;
+    :temCargaHoraria 4 ;
+    rdfs:label "Bases de Dados I" ;
+    :pertenceA :CursoInformatica .
+
+:BDII a :Disciplina ;
+    :temCodigo "INF201" ;
+    :temCargaHoraria 4 ;
+    rdfs:label "Bases de Dados II" ;
+    :pertenceA :CursoInformatica ;
+    :requerPreRequisito :BDI .
+
+:BDIII a :Disciplina ;
+    :temCodigo "INF301" ;
+    :temCargaHoraria 4 ;
+    rdfs:label "Bases de Dados Avançadas" ;
+    :pertenceA :CursoInformatica ;
+    :requerPreRequisito :BDII .
+
+:ProgI a :Disciplina ;
+    :temCodigo "INF102" ;
+    :temCargaHoraria 6 ;
+    rdfs:label "Programação I" ;
+    :pertenceA :CursoInformatica .
+
+:ProgII a :Disciplina ;
+    :temCodigo "INF202" ;
+    :temCargaHoraria 6 ;
+    rdfs:label "Programação II" ;
+    :pertenceA :CursoInformatica ;
+    :requerPreRequisito :ProgI .
+
+:IA a :Disciplina ;
+    :temCodigo "INF302" ;
+    :temCargaHoraria 5 ;
+    rdfs:label "Inteligência Artificial" ;
+    :pertenceA :CursoInformatica ;
+    :requerPreRequisito :ProgII ;
+    :requerPreRequisito :BDII .
+
+# ============================================
+# DOCENTES (3)
+# ============================================
+:ProfSilva a :Docente ;
+    :temNome "Carlos Silva" ;
+    :temEmail "csilva@instituicao.ao" ;
+    :trabalhaEm :DEI ;
+    :leciona :BDI, :BDII, :BDIII .
+
+:ProfMendes a :Docente ;
+    :temNome "Ana Mendes" ;
+    :temEmail "amendes@instituicao.ao" ;
+    :trabalhaEm :DEI ;
+    :leciona :ProgI, :ProgII .
+
+:ProfCosta a :Docente ;
+    :temNome "Rui Costa" ;
+    :temEmail "rcosta@instituicao.ao" ;
+    :trabalhaEm :DEI ;
+    :leciona :IA .
+
+# ============================================
+# ESTUDANTES (6) - incluindo 2 bolseiros
+# ============================================
+:Joao a :Estudante ;
+    :temNome "João Manuel" ;
+    :temEmail "joao@aluno.ao" ;
+    :temNumeroEstudante "2023001" ;
+    :estaMatriculadoEm :CursoInformatica ;
+    :frequenta :BDI, :ProgI, :BDII, :ProgII .
+
+:Maria a :EstudanteBolseiro ;
+    :temNome "Maria Fernandes" ;
+    :temEmail "maria@aluno.ao" ;
+    :temNumeroEstudante "2023002" ;
+    :temValorBolsa "15000.00"^^xsd:decimal ;
+    :estaMatriculadoEm :CursoInformatica ;
+    :frequenta :BDI, :ProgI, :BDII, :ProgII, :IA .
+
+:Pedro a :Estudante ;
+    :temNome "Pedro Alberto" ;
+    :temEmail "pedro@aluno.ao" ;
+    :temNumeroEstudante "2023003" ;
+    :estaMatriculadoEm :CursoInformatica ;
+    :frequenta :BDI, :ProgI .
+
+:Ana a :EstudanteBolseiro ;
+    :temNome "Ana Beatriz" ;
+    :temEmail "ana@aluno.ao" ;
+    :temNumeroEstudante "2023004" ;
+    :temValorBolsa "12000.00"^^xsd:decimal ;
+    :estaMatriculadoEm :CursoInformatica ;
+    :frequenta :BDI, :ProgI, :BDII .
+
+:Carlos a :Estudante ;
+    :temNome "Carlos Eduardo" ;
+    :temEmail "carlos@aluno.ao" ;
+    :temNumeroEstudante "2023005" ;
+    :estaMatriculadoEm :CursoMecanica ;
+    :frequenta :BDI .
+
+:Sofia a :Estudante ;
+    :temNome "Sofia Ribeiro" ;
+    :temEmail "sofia@aluno.ao" ;
+    :temNumeroEstudante "2023006" ;
+    :estaMatriculadoEm :CursoInformatica ;
+    :frequenta :BDI, :ProgI, :BDII, :ProgII, :IA .
+
+# ============================================
+# RELAÇÕES SIMÉTRICAS (Colegas - mesma turma)
+# ============================================
+:Joao :colegaDe :Maria, :Pedro, :Ana .
+:Maria :colegaDe :Sofia .
+
+# ============================================
+# AVALIAÇÕES
+# ============================================
+:Av001 a :Avaliacao ;
+    :avaliacaoDe :Joao ;
+    :avaliaDisciplina :BDI ;
+    :temNota "16.0"^^xsd:decimal ;
+    :temData "2025-06-15"^^xsd:date .
+:Joao :temAvaliacao :Av001 .
+
+:Av002 a :Avaliacao ;
+    :avaliacaoDe :Joao ;
+    :avaliaDisciplina :ProgI ;
+    :temNota "14.5"^^xsd:decimal ;
+    :temData "2025-06-20"^^xsd:date .
+:Joao :temAvaliacao :Av002 .
+
+:Av003 a :Avaliacao ;
+    :avaliacaoDe :Maria ;
+    :avaliaDisciplina :BDI ;
+    :temNota "18.0"^^xsd:decimal ;
+    :temData "2025-06-15"^^xsd:date .
+:Maria :temAvaliacao :Av003 .
+
+:Av004 a :Avaliacao ;
+    :avaliacaoDe :Maria ;
+    :avaliaDisciplina :BDII ;
+    :temNota "17.5"^^xsd:decimal ;
+    :temData "2025-12-10"^^xsd:date .
+:Maria :temAvaliacao :Av004 .
+
+:Av005 a :Avaliacao ;
+    :avaliacaoDe :Pedro ;
+    :avaliaDisciplina :BDI ;
+    :temNota "9.0"^^xsd:decimal ;
+    :temData "2025-06-15"^^xsd:date .
+:Pedro :temAvaliacao :Av005 .
+
+:Av006 a :Avaliacao ;
+    :avaliacaoDe :Ana ;
+    :avaliaDisciplina :BDI ;
+    :temNota "15.0"^^xsd:decimal ;
+    :temData "2025-06-15"^^xsd:date .
+:Ana :temAvaliacao :Av006 .
+
+:Av007 a :Avaliacao ;
+    :avaliacaoDe :Ana ;
+    :avaliaDisciplina :BDII ;
+    :temNota "13.0"^^xsd:decimal ;
+    :temData "2025-12-10"^^xsd:date .
+:Ana :temAvaliacao :Av007 .
+
+:Av008 a :Avaliacao ;
+    :avaliacaoDe :Sofia ;
+    :avaliaDisciplina :BDI ;
+    :temNota "19.0"^^xsd:decimal ;
+    :temData "2025-06-15"^^xsd:date .
+:Sofia :temAvaliacao :Av008 .
+
+:Av009 a :Avaliacao ;
+    :avaliacaoDe :Sofia ;
+    :avaliaDisciplina :ProgII ;
+    :temNota "16.5"^^xsd:decimal ;
+    :temData "2025-12-15"^^xsd:date .
+:Sofia :temAvaliacao :Av009 .
+
+:Av010 a :Avaliacao ;
+    :avaliacaoDe :Carlos ;
+    :avaliaDisciplina :BDI ;
+    :temNota "11.0"^^xsd:decimal ;
+    :temData "2025-06-15"^^xsd:date .
+:Carlos :temAvaliacao :Av010 .

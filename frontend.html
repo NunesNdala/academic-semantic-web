@@ -1,0 +1,1005 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>IPH/UMN — Sistema Académico</title>
+<style>
+:root{
+  --azul:#0D2B4E;--azul2:#1A5276;--azul3:#2E86C1;--claro:#EAF4FB;
+  --borda:#C5D8E8;--fundo:#F3F6FA;--txt:#2C3E50;
+  --verde:#1E8449;--vclaro:#E9F7EF;
+  --vermelho:#C0392B;--veclaro:#FDEDEC;
+  --ouro:#B7770D;--oclaro:#FEF9E7;
+  --cinza:#7F8C8D;
+  --r:8px;--s:0 2px 10px rgba(13,43,78,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--fundo);color:var(--txt);min-height:100vh}
+
+/* ---- ECRÃ DE LOGIN / CADASTRO ---- */
+#ecrã-auth{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--azul) 0%,var(--azul3) 100%)}
+.caixa-auth{background:white;border-radius:14px;box-shadow:0 8px 32px #0005;padding:2.5rem;width:100%;max-width:420px}
+.logo-auth{text-align:center;margin-bottom:1.5rem}
+.logo-auth h1{font-family:Georgia,serif;font-size:1.4rem;color:var(--azul);margin-bottom:.3rem}
+.logo-auth p{font-size:.8rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em}
+.tabs-auth{display:flex;border:1px solid var(--borda);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem}
+.tab-btn{flex:1;padding:.6rem;font-size:.85rem;font-weight:700;border:0;cursor:pointer;background:white;color:var(--cinza);transition:all .2s}
+.tab-btn.activo{background:var(--azul);color:white}
+.forma-auth{display:none}.forma-auth.activo{display:block}
+.papel-select{display:flex;gap:.5rem;margin-bottom:1rem}
+.papel-btn{flex:1;padding:.5rem;border:1px solid var(--borda);border-radius:var(--r);background:white;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--cinza);transition:all .2s}
+.papel-btn.activo{border-color:var(--azul3);background:var(--claro);color:var(--azul)}
+.campo{margin-bottom:1rem}
+.campo label{display:block;font-size:.8rem;font-weight:700;color:var(--azul);margin-bottom:.3rem}
+.campo input,.campo select{width:100%;padding:.6rem .85rem;border:1px solid var(--borda);border-radius:var(--r);font:inherit;color:var(--txt)}
+.campo input:focus,.campo select:focus{outline:2px solid var(--azul3);border-color:var(--azul3)}
+.btn-principal{width:100%;padding:.75rem;background:var(--azul);color:white;border:0;border-radius:var(--r);font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-principal:hover{background:var(--azul2)}
+.msg-auth{margin-top:.75rem;padding:.6rem .9rem;border-radius:var(--r);font-size:.84rem;display:none}
+.msg-auth.erro{background:var(--veclaro);color:var(--vermelho);display:block}
+.msg-auth.ok{background:var(--vclaro);color:var(--verde);display:block}
+.dica-auth{margin-top:1rem;background:var(--claro);border-radius:var(--r);padding:.75rem;font-size:.76rem;color:var(--azul2)}
+.dica-auth strong{display:block;margin-bottom:.35rem;font-size:.78rem}
+.dica-auth span{display:block;margin:.2rem 0}
+
+/* ---- LAYOUT PRINCIPAL ---- */
+#ecrã-app{display:none}
+header{background:var(--azul);color:white;padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px #0004}
+.header-esq{display:flex;align-items:center;gap:1rem}
+.header-esq h1{font-family:Georgia,serif;font-size:1rem;font-weight:400}
+.header-esq h1 span{display:block;font-size:.7rem;color:#aac5e0;text-transform:uppercase}
+.badge-papel{padding:.25rem .75rem;border-radius:999px;font-size:.7rem;font-weight:700;text-transform:uppercase}
+.badge-estudante{background:#1A5276;border:1px solid #2E86C1}
+.badge-docente{background:#1E5631;border:1px solid #27AE60}
+.badge-admin{background:#6E2F00;border:1px solid #E67E22}
+#btn-logout{background:transparent;border:1px solid #aac5e0;color:white;padding:.3rem .8rem;border-radius:var(--r);cursor:pointer;font-size:.8rem}
+#btn-logout:hover{background:#ffffff22}
+#nome-utilizador{font-size:.82rem;color:#cce0f5}
+
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+nav{background:white;border-right:1px solid var(--borda);padding:1rem 0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.nav-label{font-size:.65rem;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;padding:.65rem 1.1rem .3rem}
+nav a{display:flex;align-items:center;gap:.5rem;padding:.6rem 1.1rem;border-left:3px solid transparent;color:var(--txt);text-decoration:none;font-size:.86rem;cursor:pointer;transition:all .15s}
+nav a:hover,nav a.activo{background:var(--claro);border-left-color:var(--azul3);color:var(--azul);font-weight:600}
+.nav-tag{margin-left:auto;font-size:.6rem;border:1px solid #C5D8E8;border-radius:999px;padding:.04rem .4rem;color:var(--azul2)}
+
+main{padding:1.75rem;max-width:1150px}
+.painel{display:none}.painel.activo{display:block}
+.topo{border-bottom:2px solid var(--claro);margin-bottom:1.25rem;padding-bottom:.85rem}
+.topo h2{font-family:Georgia,serif;color:var(--azul);font-size:1.35rem}
+.topo p{font-size:.85rem;color:var(--cinza);margin-top:.2rem}
+.chip{display:inline-block;font-size:.65rem;font-weight:700;text-transform:uppercase;padding:.15rem .55rem;border-radius:999px;margin-bottom:.4rem}
+.chip-info{background:var(--claro);color:var(--azul2);border:1px solid #C5D8E8}
+.chip-crud{background:var(--vclaro);color:var(--verde);border:1px solid #A9DFBF}
+.chip-owl{background:var(--oclaro);color:var(--ouro);border:1px solid #F9E79F}
+.chip-admin{background:#FBEEE6;color:#784212;border:1px solid #FAD7A0}
+
+.card{background:white;border:1px solid var(--borda);border-radius:var(--r);box-shadow:var(--s);padding:1rem 1.25rem;margin-bottom:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem}
+.mini{background:white;border:1px solid var(--borda);border-radius:var(--r);box-shadow:var(--s);padding:1rem}
+.mini h3{font-size:.93rem;color:var(--azul);margin-bottom:.3rem}
+.mini p{font-size:.8rem;color:var(--cinza);margin:.15rem 0}
+
+.toolbar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.btn{border:0;border-radius:var(--r);padding:.5rem .9rem;font-weight:700;cursor:pointer;font-size:.82rem;transition:all .15s}
+.btn-pri{background:var(--azul);color:white}.btn-pri:hover{background:var(--azul2)}
+.btn-sec{background:white;color:var(--azul2);border:1px solid var(--borda)}.btn-sec:hover{background:var(--claro)}
+.btn-verde{background:var(--verde);color:white}.btn-verde:hover{background:#196F3D}
+.btn-danger{background:var(--veclaro);color:var(--vermelho);border:1px solid #F5B7B1}
+
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fg{margin-bottom:.85rem}
+.fg label{display:block;font-size:.8rem;font-weight:700;color:var(--azul);margin-bottom:.3rem}
+.fg input,.fg select{width:100%;padding:.5rem .75rem;border:1px solid var(--borda);border-radius:var(--r);font:inherit;color:var(--txt)}
+.fg input:focus,.fg select:focus{outline:2px solid var(--azul3)}
+
+.wrap{overflow-x:auto;border:1px solid var(--borda);border-radius:var(--r);background:white;box-shadow:var(--s);margin-bottom:1rem}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+th{background:var(--azul);color:white;text-align:left;padding:.65rem .85rem;text-transform:uppercase;font-size:.72rem;white-space:nowrap}
+td{padding:.6rem .85rem;border-bottom:1px solid var(--borda);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:var(--claro)}
+
+.pill{display:inline-flex;border-radius:999px;background:var(--claro);color:var(--azul);padding:.14rem .5rem;font-size:.7rem;margin:.1rem}
+.pill-bolsa{background:var(--oclaro);color:var(--ouro);border:1px solid #F9E79F}
+.pill-rep{background:var(--veclaro);color:var(--vermelho);border:1px solid #F5B7B1}
+.pill-apr{background:var(--vclaro);color:var(--verde);border:1px solid #A9DFBF}
+
+.alerta{padding:.7rem 1rem;border-radius:var(--r);font-size:.86rem;margin-bottom:1rem}
+.alerta-ok{background:var(--vclaro);color:var(--verde);border:1px solid #A9DFBF}
+.alerta-err{background:var(--veclaro);color:var(--vermelho);border:1px solid #F5B7B1}
+.alerta-info{background:var(--claro);color:var(--azul);border:1px solid #C5D8E8}
+
+.estado{text-align:center;color:var(--cinza);padding:2.5rem 1rem;font-size:.9rem}
+.nota-owl{background:var(--oclaro);border-left:4px solid var(--ouro);padding:.7rem 1rem;border-radius:0 var(--r) var(--r) 0;font-size:.81rem;color:var(--ouro);margin-bottom:1rem}
+
+.resumo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem}
+.resumo-card{background:white;border:1px solid var(--borda);border-radius:var(--r);box-shadow:var(--s);padding:1.25rem;text-align:center}
+.resumo-card .num{font-size:2rem;font-weight:700;color:var(--azul);line-height:1}
+.resumo-card .label{font-size:.75rem;color:var(--cinza);margin-top:.35rem;text-transform:uppercase}
+
+footer{background:var(--azul);color:#8EACC5;text-align:center;font-size:.72rem;padding:.65rem;margin-top:2rem}
+
+@media(max-width:760px){
+  .layout{grid-template-columns:1fr}
+  nav{position:static;height:auto}
+  .formgrid{grid-template-columns:1fr}
+  main{padding:1rem}
+  header{padding:0 1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== ECRÃ AUTH ===================== -->
+<div id="ecrã-auth">
+<div class="caixa-auth">
+  <div class="logo-auth">
+    <h1>Instituto Politécnico da Huíla</h1>
+    <p>Universidade Mandume Ya Ndemufayo — Sistema Académico</p>
+  </div>
+
+  <div class="tabs-auth">
+    <button class="tab-btn activo" onclick="mudarTab('login')">Entrar</button>
+    <button class="tab-btn" onclick="mudarTab('cadastro')">Novo Estudante</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="forma-auth activo" id="tab-login">
+    <div class="papel-select">
+      <button class="papel-btn activo" onclick="selecionarPapel(this,'estudante')">Estudante</button>
+      <button class="papel-btn" onclick="selecionarPapel(this,'docente')">Docente</button>
+      <button class="papel-btn" onclick="selecionarPapel(this,'admin')">Admin</button>
+    </div>
+    <div class="campo"><label>Email institucional</label><input id="login-email" type="email" placeholder="nome@iph.edu.ao"></div>
+    <div class="campo"><label>Senha</label><input id="login-senha" type="password" placeholder="••••••••"></div>
+    <button class="btn-principal" onclick="fazerLogin()">Entrar no Sistema</button>
+    <div id="msg-login" class="msg-auth"></div>
+    <div class="dica-auth">
+      <strong>Contas de demonstração:</strong>
+      <span>📘 Estudante: joao.luvumba@iph.edu.ao / joao123</span>
+      <span>📗 Docente: csilva@iph.edu.ao / csilva123</span>
+      <span>📕 Admin: admin@iph.edu.ao / admin2025</span>
+    </div>
+  </div>
+
+  <!-- CADASTRO ESTUDANTE -->
+  <div class="forma-auth" id="tab-cadastro">
+    <div class="campo"><label>Nome completo</label><input id="cad-nome" placeholder="João Manuel Luvumba"></div>
+    <div class="campo"><label>Email institucional</label><input id="cad-email" type="email" placeholder="nome@iph.edu.ao"></div>
+    <div class="campo"><label>Número de estudante</label><input id="cad-numero" placeholder="2025/INF/001"></div>
+    <div class="campo"><label>Curso</label>
+      <select id="cad-curso">
+        <option value="CursoInformatica">Lic. em Engenharia Informática</option>
+        <option value="CursoMecanica">Lic. em Engenharia Mecânica</option>
+        <option value="CursoGestao">Lic. em Gestão de Empresas</option>
+      </select>
+    </div>
+    <div class="campo"><label>Senha</label><input id="cad-senha" type="password" placeholder="Mínimo 6 caracteres"></div>
+    <div class="campo"><label>Bolsa de estudo (AOA, opcional)</label><input id="cad-bolsa" type="number" placeholder="Ex: 75000"></div>
+    <button class="btn-principal" onclick="fazerCadastro()">Criar Conta</button>
+    <div id="msg-cadastro" class="msg-auth"></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== ECRÃ APP ===================== -->
+<div id="ecrã-app">
+<header>
+  <div class="header-esq">
+    <h1>IPH — Sistema Académico<span>Instituto Politécnico da Huíla / UMN</span></h1>
+    <span id="badge-papel" class="badge-papel"></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <span id="nome-utilizador"></span>
+    <button id="btn-logout" onclick="fazerLogout()">Sair</button>
+  </div>
+</header>
+
+<div class="layout">
+<nav id="nav-lateral"></nav>
+<main id="conteudo-main">
+  <!-- Painéis gerados dinamicamente conforme o papel -->
+
+  <!-- ========== ESTUDANTE ========== -->
+  <section id="painel-minha-area" class="painel">
+    <div class="topo"><span class="chip chip-info">Minha Área</span><h2>Perfil Académico</h2><p>Os teus dados, curso e situação académica.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarMinhaArea()">Actualizar</button></div>
+    <div id="conteudo-minha-area"></div>
+  </section>
+
+  <section id="painel-minhas-avaliacoes" class="painel">
+    <div class="topo"><span class="chip chip-info">Notas</span><h2>As Minhas Avaliações</h2><p>Resultados das tuas avaliações por disciplina.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarMinhasAvaliacoes()">Actualizar</button></div>
+    <div id="conteudo-minhas-avaliacoes"></div>
+  </section>
+
+  <section id="painel-meus-colegas" class="painel">
+    <div class="topo"><span class="chip chip-owl">Simetria OWL</span><h2>Os Meus Colegas</h2><p>Relação colegaDe inferida por simetria OWL-RL.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarMeusColegas()">Actualizar</button></div>
+    <div id="conteudo-meus-colegas"></div>
+  </section>
+
+  <!-- ========== DOCENTE ========== -->
+  <section id="painel-minhas-disciplinas" class="painel">
+    <div class="topo"><span class="chip chip-info">Docente</span><h2>As Minhas Disciplinas</h2><p>Disciplinas atribuídas ao teu perfil docente.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarMinhasDisciplinas()">Actualizar</button></div>
+    <div id="conteudo-minhas-disciplinas"></div>
+  </section>
+
+  <section id="painel-turma" class="painel">
+    <div class="topo"><span class="chip chip-info">Turma</span><h2>Estudantes por Turma</h2><p>Selecciona a disciplina para ver os estudantes inscritos.</p></div>
+    <div class="card">
+      <div class="fg"><label>Disciplina</label><select id="sel-turma-disc"></select></div>
+      <button class="btn btn-pri" onclick="carregarTurma()">Ver Turma</button>
+    </div>
+    <div id="conteudo-turma"></div>
+  </section>
+
+  <section id="painel-lancar-nota" class="painel">
+    <div class="topo"><span class="chip chip-crud">CRUD</span><h2>Lançar Avaliação</h2><p>Regista ou edita notas dos estudantes nas tuas disciplinas.</p></div>
+    <div id="msg-nota"></div>
+    <div class="card">
+      <div class="formgrid">
+        <div class="fg"><label>ID da Avaliação</label><input id="nota-id" placeholder="Av011"></div>
+        <div class="fg"><label>Data</label><input id="nota-data" type="date"></div>
+        <div class="fg"><label>Estudante</label><select id="nota-estudante"></select></div>
+        <div class="fg"><label>Disciplina</label><select id="nota-disciplina"></select></div>
+        <div class="fg"><label>Nota (0–20)</label><input id="nota-valor" type="number" min="0" max="20" step="0.1"></div>
+      </div>
+      <div class="toolbar">
+        <button id="btn-nota" class="btn btn-verde" onclick="guardarNota()">Lançar Nota</button>
+        <button class="btn btn-sec" onclick="limparFormNota()">Limpar</button>
+      </div>
+    </div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarTodasAvaliacoes()">Ver Todas as Avaliações</button></div>
+    <div id="conteudo-avaliacoes-doc"></div>
+  </section>
+
+  <!-- ========== PÚBLICO / SEMÂNTICA ========== -->
+  <section id="painel-estudantes" class="painel">
+    <div class="topo"><span class="chip chip-info">Consulta</span><h2>Estudantes</h2><p>Lista completa de estudantes matriculados.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarEstudantes()">Actualizar</button></div>
+    <div id="conteudo-estudantes"></div>
+  </section>
+
+  <section id="painel-docentes" class="painel">
+    <div class="topo"><span class="chip chip-info">Consulta</span><h2>Docentes</h2><p>Corpo docente, departamentos e disciplinas.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarDocentes()">Carregar</button></div>
+    <div id="conteudo-docentes"></div>
+  </section>
+
+  <section id="painel-disciplinas" class="painel">
+    <div class="topo"><span class="chip chip-info">Consulta</span><h2>Disciplinas</h2><p>Código, carga horária, curso e pré-requisitos.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarDisciplinas()">Carregar</button></div>
+    <div id="conteudo-disciplinas"></div>
+  </section>
+
+  <section id="painel-bolseiros" class="painel">
+    <div class="topo"><span class="chip chip-owl">Semântica</span><h2>Estudantes Bolseiros</h2><p>Classe EstudanteBolseiro com valor de bolsa em AOA.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarBolseiros()">Carregar</button></div>
+    <div id="conteudo-bolseiros"></div>
+  </section>
+
+  <section id="painel-prerequisitos" class="painel">
+    <div class="topo"><span class="chip chip-owl">OWL Transitivo</span><h2>Pré-Requisitos</h2><p>Directos e indirectos inferidos por transitividade OWL-RL.</p></div>
+    <div class="nota-owl">⚙️ O <em>reasoner</em> infere automaticamente cadeias de pré-requisitos — ex: BDIII exige BDII que exige BDI.</div>
+    <div class="card">
+      <div class="fg"><label>Disciplina</label><select id="sel-prereq-disc"></select></div>
+      <button class="btn btn-pri" onclick="carregarPrerequisitos()">Consultar</button>
+    </div>
+    <div id="conteudo-prerequisitos"></div>
+  </section>
+
+  <section id="painel-elegiveis" class="painel">
+    <div class="topo"><span class="chip chip-owl">OWL</span><h2>Estudantes Elegíveis</h2><p>Cumprem todos os pré-requisitos e ainda não frequentam a disciplina.</p></div>
+    <div class="card">
+      <div class="fg"><label>Disciplina</label><select id="sel-eleg-disc"></select></div>
+      <button class="btn btn-pri" onclick="carregarElegiveis()">Ver Elegíveis</button>
+    </div>
+    <div id="conteudo-elegiveis"></div>
+  </section>
+
+  <section id="painel-reprovados" class="painel">
+    <div class="topo"><span class="chip chip-owl">Semântica</span><h2>Reprovações</h2><p>Estudantes com nota inferior a 10 — marcados semanticamente no grafo.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarReprovados()">Carregar</button></div>
+    <div id="conteudo-reprovados"></div>
+  </section>
+
+  <section id="painel-estatisticas" class="painel">
+    <div class="topo"><span class="chip chip-owl">SPARQL</span><h2>Estatísticas</h2><p>Médias por disciplina via consulta SPARQL com propriedade inversa.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarEstatisticas()">Carregar</button></div>
+    <div id="conteudo-estatisticas"></div>
+  </section>
+
+  <!-- ========== ADMIN ========== -->
+  <section id="painel-admin-resumo" class="painel">
+    <div class="topo"><span class="chip chip-admin">Admin</span><h2>Resumo Institucional</h2><p>IPH / UMN — contagem de entidades no grafo RDF.</p></div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarResumo()">Actualizar</button></div>
+    <div id="conteudo-resumo"></div>
+  </section>
+
+  <section id="painel-admin-dep" class="painel">
+    <div class="topo"><span class="chip chip-admin">CRUD</span><h2>Departamentos</h2><p>Gerir departamentos da IPH/UMN.</p></div>
+    <div id="msg-dep"></div>
+    <div class="card">
+      <div class="formgrid">
+        <div class="fg"><label>ID (sem espaços)</label><input id="dep-id" placeholder="DCI"></div>
+        <div class="fg"><label>Sigla</label><input id="dep-sigla" placeholder="DCI"></div>
+      </div>
+      <div class="fg"><label>Nome completo</label><input id="dep-nome" placeholder="Departamento de Ciências Informáticas"></div>
+      <div class="toolbar">
+        <button id="btn-dep" class="btn btn-verde" onclick="guardarDep()">Criar Departamento</button>
+        <button class="btn btn-sec" onclick="limparDep()">Limpar</button>
+      </div>
+    </div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarDeps()">Actualizar Lista</button></div>
+    <div id="conteudo-dep"></div>
+  </section>
+
+  <section id="painel-admin-cursos" class="painel">
+    <div class="topo"><span class="chip chip-admin">CRUD</span><h2>Cursos</h2><p>Gerir licenciaturas e associar a departamentos.</p></div>
+    <div id="msg-curso"></div>
+    <div class="card">
+      <div class="formgrid">
+        <div class="fg"><label>ID (sem espaços)</label><input id="curso-id" placeholder="CursoEngCivil"></div>
+        <div class="fg"><label>Departamento</label><select id="curso-dep"></select></div>
+      </div>
+      <div class="fg"><label>Nome do curso</label><input id="curso-nome" placeholder="Licenciatura em Engenharia Civil"></div>
+      <div class="toolbar">
+        <button id="btn-curso" class="btn btn-verde" onclick="guardarCurso()">Criar Curso</button>
+        <button class="btn btn-sec" onclick="limparCurso()">Limpar</button>
+      </div>
+    </div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarCursosList()">Actualizar Lista</button></div>
+    <div id="conteudo-cursos"></div>
+  </section>
+
+  <section id="painel-admin-docentes" class="painel">
+    <div class="topo"><span class="chip chip-admin">CRUD</span><h2>Docentes</h2><p>Registar e gerir o corpo docente.</p></div>
+    <div id="msg-admin-doc"></div>
+    <div class="card">
+      <div class="formgrid">
+        <div class="fg"><label>ID RDF</label><input id="adoc-id" placeholder="ProfSousa"></div>
+        <div class="fg"><label>Departamento</label><select id="adoc-dep"></select></div>
+        <div class="fg"><label>Nome</label><input id="adoc-nome" placeholder="Maria Sousa"></div>
+        <div class="fg"><label>Email (@iph.edu.ao)</label><input id="adoc-email" type="email" placeholder="msousa@iph.edu.ao"></div>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-verde" onclick="criarDocente()">Criar Docente</button>
+        <button class="btn btn-sec" onclick="limparDocAdmin()">Limpar</button>
+      </div>
+    </div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarDocentesAdmin()">Actualizar Lista</button></div>
+    <div id="conteudo-docentes-admin"></div>
+  </section>
+
+  <section id="painel-admin-disciplinas" class="painel">
+    <div class="topo"><span class="chip chip-admin">CRUD</span><h2>Disciplinas</h2><p>Gerir disciplinas, pré-requisitos e afectação de docentes.</p></div>
+    <div id="msg-disc"></div>
+    <div class="card">
+      <div class="formgrid">
+        <div class="fg"><label>ID RDF</label><input id="disc-id" placeholder="ArqSistemas"></div>
+        <div class="fg"><label>Código</label><input id="disc-codigo" placeholder="INF401"></div>
+        <div class="fg"><label>Nome</label><input id="disc-nome" placeholder="Arquitectura de Sistemas"></div>
+        <div class="fg"><label>Carga Horária (h)</label><input id="disc-carga" type="number" placeholder="4"></div>
+        <div class="fg"><label>Curso</label><select id="disc-curso"></select></div>
+        <div class="fg"><label>Docente</label><select id="disc-docente"><option value="">— Sem docente —</option></select></div>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-verde" onclick="criarDisciplina()">Criar Disciplina</button>
+        <button class="btn btn-sec" onclick="limparDiscAdmin()">Limpar</button>
+      </div>
+    </div>
+    <div class="toolbar"><button class="btn btn-pri" onclick="carregarDiscAdmin()">Actualizar Lista</button></div>
+    <div id="conteudo-disc-admin"></div>
+  </section>
+
+</main>
+</div>
+<footer>Instituto Politécnico da Huíla · Universidade Mandume Ya Ndemufayo · Sistema de Gestão Académica v3.0 · Web Semântica OWL-RL + SPARQL</footer>
+</div>
+
+<script>
+const API = '';
+let papelActual = '';
+let idRdfActual = '';
+
+// ============================================================
+//  AUTH
+// ============================================================
+function mudarTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('activo', (i===0&&tab==='login')||(i===1&&tab==='cadastro')));
+  document.getElementById('tab-login').classList.toggle('activo', tab==='login');
+  document.getElementById('tab-cadastro').classList.toggle('activo', tab==='cadastro');
+}
+
+function selecionarPapel(btn) {
+  document.querySelectorAll('.papel-btn').forEach(b => b.classList.remove('activo'));
+  btn.classList.add('activo');
+  const dicas = {
+    estudante: 'joao.luvumba@iph.edu.ao / joao123',
+    docente:   'csilva@iph.edu.ao / csilva123',
+    admin:     'admin@iph.edu.ao / admin2025'
+  };
+  const p = btn.textContent.trim().toLowerCase();
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-senha').value = '';
+}
+
+async function fazerLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  const msg = document.getElementById('msg-login');
+  msg.className = 'msg-auth'; msg.textContent = '';
+  if (!email || !senha) { msg.className='msg-auth erro'; msg.textContent='Preenche o email e a senha.'; return; }
+  try {
+    const r = await fetch(`${API}/auth/login`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,senha}),credentials:'include'});
+    const d = await r.json();
+    if (!r.ok) { msg.className='msg-auth erro'; msg.textContent=d.erro||'Erro ao entrar.'; return; }
+    papelActual = d.papel; idRdfActual = d.id_rdf;
+    entrarNoApp(d);
+  } catch(e) { msg.className='msg-auth erro'; msg.textContent='Não foi possível ligar ao servidor.'; }
+}
+
+async function fazerCadastro() {
+  const nome = document.getElementById('cad-nome').value.trim();
+  const email = document.getElementById('cad-email').value.trim();
+  const numero = document.getElementById('cad-numero').value.trim();
+  const curso = document.getElementById('cad-curso').value;
+  const senha = document.getElementById('cad-senha').value;
+  const bolsa = document.getElementById('cad-bolsa').value;
+  const msg = document.getElementById('msg-cadastro');
+  msg.className='msg-auth'; msg.textContent='';
+  if (!nome||!email||!numero||!senha) { msg.className='msg-auth erro'; msg.textContent='Preenche todos os campos obrigatórios.'; return; }
+  try {
+    const r = await fetch(`${API}/auth/cadastro`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome,email,numero,curso,senha,valor_bolsa:bolsa||null}),credentials:'include'});
+    const d = await r.json();
+    if (!r.ok) { msg.className='msg-auth erro'; msg.textContent=d.erro||'Erro.'; return; }
+    msg.className='msg-auth ok'; msg.textContent='Conta criada! Entra com o teu email e senha.';
+    setTimeout(()=>mudarTab('login'),2000);
+  } catch(e) { msg.className='msg-auth erro'; msg.textContent='Erro de ligação.'; }
+}
+
+async function fazerLogout() {
+  await fetch(`${API}/auth/logout`,{method:'POST',credentials:'include'});
+  document.getElementById('ecrã-app').style.display='none';
+  document.getElementById('ecrã-auth').style.display='flex';
+  papelActual=''; idRdfActual='';
+}
+
+function entrarNoApp(info) {
+  document.getElementById('ecrã-auth').style.display='none';
+  document.getElementById('ecrã-app').style.display='block';
+  const badge = document.getElementById('badge-papel');
+  badge.textContent = info.papel;
+  badge.className = `badge-papel badge-${info.papel}`;
+  document.getElementById('nome-utilizador').textContent = info.email;
+  construirNav(info.papel);
+  // Painel inicial por papel
+  if (info.papel==='estudante') { mostrar('minha-area'); carregarMinhaArea(); }
+  else if (info.papel==='docente') { mostrar('minhas-disciplinas'); carregarMinhasDisciplinas(); }
+  else { mostrar('admin-resumo'); carregarResumo(); }
+}
+
+function construirNav(papel) {
+  const nav = document.getElementById('nav-lateral');
+  const secoes = {
+    estudante: `
+      <div class="nav-label">Minha Área</div>
+      <a onclick="mostrar('minha-area');carregarMinhaArea()">📋 Perfil Académico</a>
+      <a onclick="mostrar('minhas-avaliacoes');carregarMinhasAvaliacoes()">📊 As Minhas Notas</a>
+      <a onclick="mostrar('meus-colegas');carregarMeusColegas()">👥 Colegas <span class="nav-tag">OWL</span></a>
+      <div class="nav-label">Consultar</div>
+      <a onclick="mostrar('estudantes');carregarEstudantes()">Estudantes</a>
+      <a onclick="mostrar('docentes');carregarDocentes()">Docentes</a>
+      <a onclick="mostrar('disciplinas');carregarDisciplinas()">Disciplinas</a>
+      <a onclick="mostrar('bolseiros');carregarBolseiros()">Bolseiros <span class="nav-tag">AOA</span></a>
+      <div class="nav-label">Semântica</div>
+      <a onclick="mostrar('prerequisitos');carregarSelsDisciplinas()">Pré-Requisitos <span class="nav-tag">OWL</span></a>
+      <a onclick="mostrar('elegiveis');carregarSelsDisciplinas()">Elegíveis <span class="nav-tag">OWL</span></a>
+      <a onclick="mostrar('reprovados');carregarReprovados()">Reprovações <span class="nav-tag">RDF</span></a>
+      <a onclick="mostrar('estatisticas');carregarEstatisticas()">Estatísticas <span class="nav-tag">SPARQL</span></a>`,
+    docente: `
+      <div class="nav-label">Área Docente</div>
+      <a onclick="mostrar('minhas-disciplinas');carregarMinhasDisciplinas()">📚 As Minhas Disciplinas</a>
+      <a onclick="mostrar('turma');carregarSelTurma()">👥 Turma</a>
+      <a onclick="mostrar('lancar-nota');carregarFormNota()">✏️ Lançar Avaliação <span class="nav-tag">CRUD</span></a>
+      <div class="nav-label">Consultar</div>
+      <a onclick="mostrar('estudantes');carregarEstudantes()">Estudantes</a>
+      <a onclick="mostrar('docentes');carregarDocentes()">Docentes</a>
+      <a onclick="mostrar('disciplinas');carregarDisciplinas()">Disciplinas</a>
+      <div class="nav-label">Semântica</div>
+      <a onclick="mostrar('prerequisitos');carregarSelsDisciplinas()">Pré-Requisitos <span class="nav-tag">OWL</span></a>
+      <a onclick="mostrar('elegiveis');carregarSelsDisciplinas()">Elegíveis <span class="nav-tag">OWL</span></a>
+      <a onclick="mostrar('reprovados');carregarReprovados()">Reprovações <span class="nav-tag">RDF</span></a>
+      <a onclick="mostrar('estatisticas');carregarEstatisticas()">Estatísticas <span class="nav-tag">SPARQL</span></a>`,
+    admin: `
+      <div class="nav-label">Administração</div>
+      <a onclick="mostrar('admin-resumo');carregarResumo()">🏛️ Resumo Institucional</a>
+      <a onclick="mostrar('admin-dep');carregarDeps()">Departamentos <span class="nav-tag">CRUD</span></a>
+      <a onclick="mostrar('admin-cursos');carregarCursosList()">Cursos <span class="nav-tag">CRUD</span></a>
+      <a onclick="mostrar('admin-docentes');carregarDocentesAdmin()">Docentes <span class="nav-tag">CRUD</span></a>
+      <a onclick="mostrar('admin-disciplinas');carregarDiscAdmin()">Disciplinas <span class="nav-tag">CRUD</span></a>
+      <div class="nav-label">Consultar</div>
+      <a onclick="mostrar('estudantes');carregarEstudantes()">Estudantes</a>
+      <a onclick="mostrar('bolseiros');carregarBolseiros()">Bolseiros <span class="nav-tag">AOA</span></a>
+      <div class="nav-label">Semântica</div>
+      <a onclick="mostrar('prerequisitos');carregarSelsDisciplinas()">Pré-Requisitos <span class="nav-tag">OWL</span></a>
+      <a onclick="mostrar('reprovados');carregarReprovados()">Reprovações <span class="nav-tag">RDF</span></a>
+      <a onclick="mostrar('estatisticas');carregarEstatisticas()">Estatísticas <span class="nav-tag">SPARQL</span></a>`
+  };
+  nav.innerHTML = secoes[papel] || '';
+}
+
+function mostrar(id) {
+  document.querySelectorAll('.painel').forEach(p=>p.classList.remove('activo'));
+  const el = document.getElementById(`painel-${id}`);
+  if (el) el.classList.add('activo');
+  document.querySelectorAll('nav a').forEach(a=>a.classList.remove('activo'));
+}
+
+// ============================================================
+//  HELPERS
+// ============================================================
+async function api(path, opts={}) {
+  return fetch(`${API}${path}`, {credentials:'include',...opts,headers:{'Content-Type':'application/json',...(opts.headers||{})}});
+}
+
+function pill(txt, cls='') { return `<span class="pill ${cls}">${txt}</span>`; }
+function situacaoPill(nota) {
+  if (nota===null||nota===undefined) return '';
+  return nota >= 10 ? pill('Aprovado ✓','pill-apr') : pill(`Reprovado ${nota}< 10`,'pill-rep');
+}
+function mostrarMsg(elId, texto, tipo='ok') {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.className = `alerta alerta-${tipo==='ok'?'ok':tipo==='err'?'err':'info'}`;
+  el.textContent = texto;
+  el.style.display='block';
+  setTimeout(()=>{ el.style.display='none'; }, 4000);
+}
+function tabelaVazia(msg='Sem dados.') { return `<div class="estado">${msg}</div>`; }
+
+function preencherSelect(sel, lista, valFn, txtFn, placeholder='') {
+  const el = document.getElementById(sel);
+  if (!el) return;
+  el.innerHTML = placeholder ? `<option value="">${placeholder}</option>` : '';
+  lista.forEach(i => { const o=document.createElement('option'); o.value=valFn(i); o.textContent=txtFn(i); el.appendChild(o); });
+}
+
+// ============================================================
+//  ÁREA ESTUDANTE
+// ============================================================
+async function carregarMinhaArea() {
+  const r = await api('/minha-area');
+  const d = await r.json();
+  const el = document.getElementById('conteudo-minha-area');
+  if (!r.ok) { el.innerHTML=`<div class="alerta alerta-err">${d.erro}</div>`; return; }
+  el.innerHTML = `
+  <div class="grid" style="margin-bottom:1rem">
+    <div class="mini"><h3>👤 ${d.nome}</h3><p>Nº: <strong>${d.numero||'—'}</strong></p><p>Email: ${d.email||'—'}</p></div>
+    <div class="mini"><h3>🎓 Curso</h3><p>${d.curso||'—'}</p>${d.bolseiro?`<p style="margin-top:.5rem">${pill('Bolseiro ✓','pill-bolsa')} <strong>${(d.valor_bolsa||0).toLocaleString()} ${d.moeda_bolsa}</strong></p>`:''}</div>
+    ${d.tem_reprovacao?`<div class="mini"><h3>⚠️ Atenção</h3><p>${pill('Tem reprovação pendente','pill-rep')}</p><p style="font-size:.78rem;margin-top:.4rem">Contacta a secretaria para 2.ª época.</p></div>`:''}
+  </div>
+  ${d.avaliacoes&&d.avaliacoes.length?`
+  <div class="topo"><h2 style="font-size:1.1rem">Avaliações Registadas</h2></div>
+  <div class="wrap"><table><thead><tr><th>Disciplina</th><th>Nota</th><th>Situação</th><th>Data</th></tr></thead><tbody>
+  ${d.avaliacoes.map(a=>`<tr><td>${a.disciplina||a.disciplina_id}</td><td><strong>${a.nota}</strong>/20</td><td>${situacaoPill(a.nota)}</td><td>${a.data||'—'}</td></tr>`).join('')}
+  </tbody></table></div>`:''}`;
+}
+
+async function carregarMinhasAvaliacoes() {
+  const r = await api('/minhas-avaliacoes');
+  const lista = await r.json();
+  const el = document.getElementById('conteudo-minhas-avaliacoes');
+  if (!lista.length) { el.innerHTML=tabelaVazia('Sem avaliações registadas.'); return; }
+  el.innerHTML = `<div class="wrap"><table><thead><tr><th>Disciplina</th><th>Nota</th><th>Situação</th><th>Data</th></tr></thead><tbody>
+  ${lista.map(a=>`<tr><td>${a.disciplina||'—'}</td><td><strong>${a.nota}</strong>/20</td><td>${situacaoPill(a.nota)}</td><td>${a.data||'—'}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function carregarMeusColegas() {
+  const r = await api('/meus-colegas');
+  const d = await r.json();
+  const el = document.getElementById('conteudo-meus-colegas');
+  if (!d.colegas||!d.colegas.length) { el.innerHTML=tabelaVazia('Nenhum colega encontrado.'); return; }
+  el.innerHTML = `<div class="alerta alerta-info">Relação simétrica — se és colega de X, X é colega teu (inferido pelo OWL-RL).</div>
+  <div class="grid">${d.colegas.map(c=>`<div class="mini"><h3>👤 ${c.nome}</h3><p>${c.email||''}</p></div>`).join('')}</div>`;
+}
+
+// ============================================================
+//  ÁREA DOCENTE
+// ============================================================
+async function carregarMinhasDisciplinas() {
+  const r = await api('/minhas-disciplinas');
+  const lista = await r.json();
+  const el = document.getElementById('conteudo-minhas-disciplinas');
+  if (!lista.length) { el.innerHTML=tabelaVazia('Nenhuma disciplina atribuída.'); return; }
+  el.innerHTML = `<div class="grid">${lista.map(d=>`
+  <div class="mini">
+    <h3>${d.nome}</h3>
+    <p>Código: <strong>${d.codigo}</strong> · ${d.carga_horaria}h/sem</p>
+    <p>${d.curso||'—'}</p>
+    ${d.prerequisitos&&d.prerequisitos.length?`<p style="margin-top:.4rem">Pré-req: ${d.prerequisitos.map(p=>pill(p.nome)).join('')}</p>`:''}
+  </div>`).join('')}</div>`;
+}
+
+async function carregarSelTurma() {
+  const r = await api('/minhas-disciplinas');
+  const lista = await r.json();
+  preencherSelect('sel-turma-disc', lista, d=>d.id, d=>d.nome, '— Selecciona —');
+}
+
+async function carregarTurma() {
+  const discId = document.getElementById('sel-turma-disc').value;
+  if (!discId) return;
+  const r = await api(`/turma/${discId}`);
+  const d = await r.json();
+  const el = document.getElementById('conteudo-turma');
+  if (!r.ok) { el.innerHTML=`<div class="alerta alerta-err">${d.erro}</div>`; return; }
+  if (!d.estudantes.length) { el.innerHTML=tabelaVazia(`Nenhum estudante inscrito em ${d.disciplina}.`); return; }
+  el.innerHTML = `<div class="alerta alerta-info">Disciplina: <strong>${d.disciplina}</strong> · ${d.total} estudante(s)</div>
+  <div class="wrap"><table><thead><tr><th>Nome</th><th>Nº</th><th>Email</th><th>Bolseiro</th></tr></thead><tbody>
+  ${d.estudantes.map(e=>`<tr><td>${e.nome}</td><td>${e.numero||'—'}</td><td>${e.email||'—'}</td><td>${e.bolseiro?pill('Sim ✓','pill-bolsa'):'—'}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function carregarFormNota() {
+  const [re, rd] = await Promise.all([api('/estudantes'), api('/minhas-disciplinas')]);
+  const ests = await re.json();
+  const discs = await rd.json();
+  preencherSelect('nota-estudante', ests, e=>e.id, e=>e.nome, '— Estudante —');
+  preencherSelect('nota-disciplina', discs, d=>d.id, d=>d.nome, '— Disciplina —');
+  document.getElementById('nota-data').value = new Date().toISOString().split('T')[0];
+}
+
+let editarNotaId = null;
+async function guardarNota() {
+  const id = document.getElementById('nota-id').value.trim();
+  const estudante = document.getElementById('nota-estudante').value;
+  const disciplina = document.getElementById('nota-disciplina').value;
+  const nota = document.getElementById('nota-valor').value;
+  const data = document.getElementById('nota-data').value;
+  if (!id||!estudante||!disciplina||!nota||!data) { mostrarMsg('msg-nota','Preenche todos os campos.','err'); return; }
+  if (editarNotaId) {
+    const r = await api(`/avaliacoes/${editarNotaId}`,{method:'PUT',body:JSON.stringify({nota:parseFloat(nota),data})});
+    const d = await r.json();
+    mostrarMsg('msg-nota', r.ok?'Avaliação actualizada.':d.erro, r.ok?'ok':'err');
+    editarNotaId=null; document.getElementById('btn-nota').textContent='Lançar Nota';
+  } else {
+    const r = await api('/avaliacoes',{method:'POST',body:JSON.stringify({id,estudante,disciplina,nota:parseFloat(nota),data})});
+    const d = await r.json();
+    mostrarMsg('msg-nota', r.ok?`Nota lançada. Situação: ${d.situacao}`:d.erro, r.ok?'ok':'err');
+  }
+  if (document.getElementById('conteudo-avaliacoes-doc').innerHTML) carregarTodasAvaliacoes();
+  limparFormNota();
+}
+
+function limparFormNota() {
+  ['nota-id','nota-valor'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('nota-estudante').selectedIndex=0;
+  document.getElementById('nota-disciplina').selectedIndex=0;
+  editarNotaId=null;
+  document.getElementById('btn-nota').textContent='Lançar Nota';
+}
+
+async function carregarTodasAvaliacoes() {
+  const r = await api('/avaliacoes');
+  const lista = await r.json();
+  const el = document.getElementById('conteudo-avaliacoes-doc');
+  if (!lista.length) { el.innerHTML=tabelaVazia(); return; }
+  el.innerHTML = `<div class="wrap"><table><thead><tr><th>ID</th><th>Estudante</th><th>Disciplina</th><th>Nota</th><th>Situação</th><th>Data</th><th>Acções</th></tr></thead><tbody>
+  ${lista.map(a=>`<tr>
+    <td>${a.id}</td><td>${a.estudante||'—'}</td><td>${a.disciplina||'—'}</td>
+    <td><strong>${a.nota}</strong>/20</td><td>${situacaoPill(a.nota)}</td><td>${a.data||'—'}</td>
+    <td>
+      <button class="btn btn-sec" style="padding:.3rem .6rem;font-size:.75rem" onclick="editarNota('${a.id}','${a.nota}','${a.data}')">✏️</button>
+      <button class="btn btn-danger" style="padding:.3rem .6rem;font-size:.75rem" onclick="apagarNota('${a.id}')">🗑️</button>
+    </td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+function editarNota(id, nota, data) {
+  document.getElementById('nota-id').value = id;
+  document.getElementById('nota-valor').value = nota;
+  document.getElementById('nota-data').value = data;
+  editarNotaId = id;
+  document.getElementById('btn-nota').textContent = 'Guardar Alterações';
+  document.getElementById('painel-lancar-nota').scrollIntoView({behavior:'smooth'});
+}
+
+async function apagarNota(id) {
+  if (!confirm(`Eliminar avaliação ${id}?`)) return;
+  const r = await api(`/avaliacoes/${id}`,{method:'DELETE'});
+  const d = await r.json();
+  mostrarMsg('msg-nota', r.ok?'Eliminada.':d.erro, r.ok?'ok':'err');
+  carregarTodasAvaliacoes();
+}
+
+// ============================================================
+//  CONSULTAS PÚBLICAS
+// ============================================================
+async function carregarEstudantes() {
+  const r = await api('/estudantes');
+  const lista = await r.json();
+  const el = document.getElementById('conteudo-estudantes');
+  if (!lista.length) { el.innerHTML=tabelaVazia(); return; }
+  el.innerHTML = `<div class="wrap"><table><thead><tr><th>Nome</th><th>Nº Estudante</th><th>Email</th><th>Curso</th><th>Situação</th></tr></thead><tbody>
+  ${lista.map(e=>`<tr>
+    <td><strong>${e.nome||'—'}</strong></td>
+    <td>${e.numero||'—'}</td>
+    <td>${e.email||'—'}</td>
+    <td>${e.curso||'—'}</td>
+    <td>${e.bolseiro?pill('Bolseiro','pill-bolsa'):''}${e.tem_reprovacao?pill('Reprovação','pill-rep'):''}</td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function carregarDocentes() {
+  const r = await api('/docentes');
+  const lista = await r.json();
+  const el = document.getElementById('conteudo-docentes');
+  if (!lista.length) { el.innerHTML=tabelaVazia(); return; }
+  el.innerHTML = `<div class="grid">${lista.map(d=>`
+  <div class="mini">
+    <h3>👨‍🏫 ${d.nome}</h3>
+    <p>📧 ${d.email||'—'}</p>
+    <p>🏛️ ${d.departamento||'—'}</p>
+    <p style="margin-top:.4rem">${d.disciplinas.map(dd=>pill(dd.nome)).join('')}</p>
+  </div>`).join('')}</div>`;
+}
+
+async function carregarDisciplinas() {
+  const r = await api('/disciplinas');
+  const lista = await r.json();
+  const el = document.getElementById('conteudo-disciplinas');
+  if (!lista.length) { el.innerHTML=tabelaVazia(); return; }
+  el.innerHTML = `<div class="wrap"><table><thead><tr><th>Código</th><th>Nome</th><th>Carga</th><th>Curso</th><th>Docente</th><th>Pré-Requisitos</th></tr></thead><tbody>
+  ${lista.map(d=>`<tr>
+    <td>${d.codigo}</td><td><strong>${d.nome}</strong></td><td>${d.carga_horaria}h</td>
+    <td>${d.curso||'—'}</td><td>${d.docente||'—'}</td>
+    <td>${d.prerequisitos&&d.prerequisitos.length?d.prerequisitos.map(p=>pill(p.nome)).join(''):'—'}</td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function carregarBolseiros() {
+  const r = await api('/bolseiros');
+  const lista = await r.json();
+  const el = document.getElementById('conteudo-bolseiros');
+  if (!lista.length) { el.innerHTML=tabelaVazia('Nenhum bolseiro encontrado.'); return; }
+  el.innerHTML = `<div class="wrap"><table><thead><tr><th>Nome</th><th>Nº</th><th>Email</th><th>Curso</th><th>Valor Bolsa</th></tr></thead><tbody>
+  ${lista.map(e=>`<tr>
+    <td><strong>${e.nome}</strong></td><td>${e.numero||'—'}</td><td>${e.email||'—'}</td><td>${e.curso||'—'}</td>
+    <td>${pill(`${(e.valor_bolsa||0).toLocaleString()} ${e.moeda_bolsa||'AOA'}`,'pill-bolsa')}</td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function carregarSelsDisciplinas() {
+  const r = await api('/disciplinas');
+  const lista = await r.json();
+  ['sel-prereq-disc','sel-eleg-disc'].forEach(id => preencherSelect(id, lista, d=>d.id, d=>d.nome, '— Selecciona —'));
+}
+
+async function carregarPrerequisitos() {
+  const discId = document.getElementById('sel-prereq-disc').value;
+  const r = await api(`/api/semantica/prerequisitos/${discId}`);
+  const d = await r.json();
+  const el = document.getElementById('conteudo-prerequisitos');
+  if (!d.prerequisitos||!d.prerequisitos.length) { el.innerHTML=`<div class="alerta alerta-info">Nenhum pré-requisito para <strong>${discId}</strong>.</div>`; return; }
+  el.innerHTML = `<div class="card"><p><strong>${discId}</strong> requer:</p><div style="margin-top:.5rem">${d.prerequisitos.map(p=>`${pill(p.nome,'pill-apr')} (${p.id})`).join(' → ')}</div><p style="margin-top:.75rem;font-size:.8rem;color:#7F8C8D">💡 ${d.nota}</p></div>`;
+}
+
+async function carregarElegiveis() {
+  const discId = document.getElementById('sel-eleg-disc').value;
+  const r = await api(`/api/semantica/elegiveis/${discId}`);
+  const d = await r.json();
+  const el = document.getElementById('conteudo-elegiveis');
+  el.innerHTML = d.estudantes.length
+    ? `<div class="alerta alerta-info">${d.total} estudante(s) elegível(eis) para <strong>${discId}</strong></div>
+       <div class="grid">${d.estudantes.map(e=>`<div class="mini"><h3>👤 ${e.nome}</h3><p>${e.id}</p></div>`).join('')}</div>`
+    : `<div class="alerta alerta-info">Nenhum estudante elegível encontrado.</div>`;
+}
+
+async function carregarReprovados() {
+  const r = await api('/api/semantica/reprovados');
+  const d = await r.json();
+  const el = document.getElementById('conteudo-reprovados');
+  if (!d.reprovados.length) { el.innerHTML=`<div class="alerta alerta-ok">✅ Sem reprovações registadas no grafo.</div>`; return; }
+  el.innerHTML = `<div class="alerta alerta-err">⚠️ ${d.total} registo(s) de reprovação (nota < 10).</div>
+  <div class="wrap"><table><thead><tr><th>Estudante</th><th>Disciplina</th><th>Nota</th><th>Situação</th></tr></thead><tbody>
+  ${d.reprovados.map(x=>`<tr><td>${x.estudante}</td><td>${x.disciplina}</td><td><strong>${x.nota}</strong>/20</td><td>${pill('Reprovado','pill-rep')}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function carregarEstatisticas() {
+  const r = await api('/api/semantica/estatisticas');
+  const lista = await r.json();
+  const el = document.getElementById('conteudo-estatisticas');
+  if (!lista.length) { el.innerHTML=tabelaVazia(); return; }
+  el.innerHTML = `<div class="wrap"><table><thead><tr><th>Disciplina</th><th>Docente</th><th>Média</th><th>Avaliações</th></tr></thead><tbody>
+  ${lista.map(s=>{
+    const cor = s.media>=10?'pill-apr':'pill-rep';
+    return `<tr><td><strong>${s.disciplina}</strong></td><td>${s.docente||'—'}</td>
+    <td>${pill(`${s.media}/20`, cor)}</td><td>${s.total_avaliacoes}</td></tr>`;
+  }).join('')}
+  </tbody></table></div>`;
+}
+
+// ============================================================
+//  ADMIN
+// ============================================================
+async function carregarResumo() {
+  const r = await api('/admin/resumo');
+  const d = await r.json();
+  const el = document.getElementById('conteudo-resumo');
+  if (!r.ok) { el.innerHTML=`<div class="alerta alerta-err">${d.erro}</div>`; return; }
+  const items = [
+    {n:d.departamentos,l:'Departamentos',i:'🏛️'},
+    {n:d.cursos,l:'Cursos',i:'🎓'},
+    {n:d.disciplinas,l:'Disciplinas',i:'📚'},
+    {n:d.docentes,l:'Docentes',i:'👨‍🏫'},
+    {n:d.estudantes,l:'Estudantes',i:'👩‍🎓'},
+    {n:d.bolseiros,l:'Bolseiros',i:'💰'},
+    {n:d.avaliacoes,l:'Avaliações',i:'📊'},
+  ];
+  el.innerHTML = `<div class="resumo-grid">${items.map(x=>`
+  <div class="resumo-card"><div class="num">${x.i} ${x.n}</div><div class="label">${x.l}</div></div>`).join('')}</div>
+  <div class="alerta alerta-info">Total de triplas RDF inferidas: <strong>${d.total_triplas}</strong></div>`;
+}
+
+// -- Departamentos --
+async function carregarDeps() {
+  const r = await api('/admin/departamentos');
+  const lista = await r.json();
+  const el = document.getElementById('conteudo-dep');
+  if (!lista.length) { el.innerHTML=tabelaVazia(); return; }
+  el.innerHTML = `<div class="wrap"><table><thead><tr><th>ID</th><th>Sigla</th><th>Nome</th><th>Acções</th></tr></thead><tbody>
+  ${lista.map(d=>`<tr><td>${d.id}</td><td>${pill(d.sigla)}</td><td>${d.nome}</td>
+  <td><button class="btn btn-danger" style="padding:.3rem .6rem;font-size:.75rem" onclick="apagarDep('${d.id}')">🗑️</button></td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function guardarDep() {
+  const id=document.getElementById('dep-id').value.trim();
+  const sigla=document.getElementById('dep-sigla').value.trim();
+  const nome=document.getElementById('dep-nome').value.trim();
+  if (!id||!sigla||!nome) { mostrarMsg('msg-dep','Preenche todos os campos.','err'); return; }
+  const r = await api('/admin/departamentos',{method:'POST',body:JSON.stringify({id,sigla,nome})});
+  const d = await r.json();
+  mostrarMsg('msg-dep', r.ok?'Departamento criado.':d.erro, r.ok?'ok':'err');
+  if (r.ok) { limparDep(); carregarDeps(); }
+}
+
+async function apagarDep(id) {
+  if (!confirm(`Eliminar departamento ${id}?`)) return;
+  const r = await api(`/admin/departamentos/${id}`,{method:'DELETE'});
+  const d = await r.json();
+  mostrarMsg('msg-dep', r.ok?'Eliminado.':d.erro, r.ok?'ok':'err');
+  carregarDeps();
+}
+function limparDep() { ['dep-id','dep-sigla','dep-nome'].forEach(id=>document.getElementById(id).value=''); }
+
+// -- Cursos --
+async function carregarCursosList() {
+  const [rc, rd] = await Promise.all([api('/admin/cursos'), api('/admin/departamentos')]);
+  const cursos = await rc.json();
+  const deps = await rd.json();
+  preencherSelect('curso-dep', deps, d=>d.id, d=>d.nome, '— Departamento —');
+  const el = document.getElementById('conteudo-cursos');
+  if (!cursos.length) { el.innerHTML=tabelaVazia(); return; }
+  el.innerHTML = `<div class="wrap"><table><thead><tr><th>ID</th><th>Nome</th><th>Departamento</th><th>Acções</th></tr></thead><tbody>
+  ${cursos.map(c=>`<tr><td>${c.id}</td><td>${c.nome}</td><td>${c.departamento_id||'—'}</td>
+  <td><button class="btn btn-danger" style="padding:.3rem .6rem;font-size:.75rem" onclick="apagarCurso('${c.id}')">🗑️</button></td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function guardarCurso() {
+  const id=document.getElementById('curso-id').value.trim();
+  const nome=document.getElementById('curso-nome').value.trim();
+  const departamento=document.getElementById('curso-dep').value;
+  if (!id||!nome||!departamento) { mostrarMsg('msg-curso','Preenche todos os campos.','err'); return; }
+  const r = await api('/admin/cursos',{method:'POST',body:JSON.stringify({id,nome,departamento})});
+  const d = await r.json();
+  mostrarMsg('msg-curso', r.ok?'Curso criado.':d.erro, r.ok?'ok':'err');
+  if (r.ok) { limparCurso(); carregarCursosList(); }
+}
+
+async function apagarCurso(id) {
+  if (!confirm(`Eliminar curso ${id}?`)) return;
+  const r = await api(`/admin/cursos/${id}`,{method:'DELETE'});
+  const d = await r.json();
+  mostrarMsg('msg-curso', r.ok?'Eliminado.':d.erro, r.ok?'ok':'err');
+  carregarCursosList();
+}
+function limparCurso() { ['curso-id','curso-nome'].forEach(id=>document.getElementById(id).value=''); }
+
+// -- Docentes Admin --
+async function carregarDocentesAdmin() {
+  const [rd, rDeps] = await Promise.all([api('/admin/docentes'), api('/admin/departamentos')]);
+  const lista = await rd.json();
+  const deps = await rDeps.json();
+  preencherSelect('adoc-dep', deps, d=>d.id, d=>d.nome, '— Departamento —');
+  const el = document.getElementById('conteudo-docentes-admin');
+  if (!lista.length) { el.innerHTML=tabelaVazia(); return; }
+  el.innerHTML = `<div class="wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Dep.</th><th>Disciplinas</th><th>Acções</th></tr></thead><tbody>
+  ${lista.map(d=>`<tr>
+    <td><strong>${d.nome}</strong></td><td>${d.email||'—'}</td><td>${d.departamento||'—'}</td>
+    <td>${d.disciplinas.map(dd=>pill(dd.nome)).join('')||'—'}</td>
+    <td><button class="btn btn-danger" style="padding:.3rem .6rem;font-size:.75rem" onclick="apagarDocente('${d.id}')">🗑️</button></td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function criarDocente() {
+  const id=document.getElementById('adoc-id').value.trim();
+  const nome=document.getElementById('adoc-nome').value.trim();
+  const email=document.getElementById('adoc-email').value.trim();
+  const departamento=document.getElementById('adoc-dep').value;
+  if (!id||!nome||!email||!departamento) { mostrarMsg('msg-admin-doc','Preenche todos os campos.','err'); return; }
+  const r = await api('/admin/docentes',{method:'POST',body:JSON.stringify({id,nome,email,departamento})});
+  const d = await r.json();
+  mostrarMsg('msg-admin-doc', r.ok?'Docente criado.':d.erro, r.ok?'ok':'err');
+  if (r.ok) { limparDocAdmin(); carregarDocentesAdmin(); }
+}
+
+async function apagarDocente(id) {
+  if (!confirm(`Eliminar docente ${id}?`)) return;
+  const r = await api(`/admin/docentes/${id}`,{method:'DELETE'});
+  const d = await r.json();
+  mostrarMsg('msg-admin-doc', r.ok?'Eliminado.':d.erro, r.ok?'ok':'err');
+  carregarDocentesAdmin();
+}
+function limparDocAdmin() { ['adoc-id','adoc-nome','adoc-email'].forEach(id=>document.getElementById(id).value=''); }
+
+// -- Disciplinas Admin --
+async function carregarDiscAdmin() {
+  const [rd, rc, rdoc] = await Promise.all([api('/admin/disciplinas'), api('/admin/cursos'), api('/admin/docentes')]);
+  const lista = await rd.json();
+  const cursos = await rc.json();
+  const docentes = await rdoc.json();
+  preencherSelect('disc-curso', cursos, c=>c.id, c=>c.nome, '— Curso —');
+  preencherSelect('disc-docente', docentes, d=>d.id, d=>d.nome, '— Sem docente —');
+  const el = document.getElementById('conteudo-disc-admin');
+  if (!lista.length) { el.innerHTML=tabelaVazia(); return; }
+  el.innerHTML = `<div class="wrap"><table><thead><tr><th>Código</th><th>Nome</th><th>Carga</th><th>Curso</th><th>Docente</th><th>Acções</th></tr></thead><tbody>
+  ${lista.map(d=>`<tr>
+    <td>${d.codigo}</td><td><strong>${d.nome}</strong></td><td>${d.carga_horaria}h</td>
+    <td>${d.curso||'—'}</td><td>${d.docente||'—'}</td>
+    <td><button class="btn btn-danger" style="padding:.3rem .6rem;font-size:.75rem" onclick="apagarDisc('${d.id}')">🗑️</button></td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function criarDisciplina() {
+  const id=document.getElementById('disc-id').value.trim();
+  const codigo=document.getElementById('disc-codigo').value.trim();
+  const nome=document.getElementById('disc-nome').value.trim();
+  const carga_horaria=document.getElementById('disc-carga').value;
+  const curso=document.getElementById('disc-curso').value;
+  const docente=document.getElementById('disc-docente').value;
+  if (!id||!codigo||!nome||!carga_horaria||!curso) { mostrarMsg('msg-disc','Preenche todos os campos obrigatórios.','err'); return; }
+  const r = await api('/admin/disciplinas',{method:'POST',body:JSON.stringify({id,codigo,nome,carga_horaria:parseInt(carga_horaria),curso,docente:docente||null})});
+  const d = await r.json();
+  mostrarMsg('msg-disc', r.ok?'Disciplina criada.':d.erro, r.ok?'ok':'err');
+  if (r.ok) { limparDiscAdmin(); carregarDiscAdmin(); }
+}
+
+async function apagarDisc(id) {
+  if (!confirm(`Eliminar disciplina ${id}?`)) return;
+  const r = await api(`/admin/disciplinas/${id}`,{method:'DELETE'});
+  const d = await r.json();
+  mostrarMsg('msg-disc', r.ok?'Eliminada.':d.erro, r.ok?'ok':'err');
+  carregarDiscAdmin();
+}
+function limparDiscAdmin() { ['disc-id','disc-codigo','disc-nome','disc-carga'].forEach(id=>document.getElementById(id).value=''); }
+
+</script>
+</body>
+</html>
