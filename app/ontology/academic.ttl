@@ -1,1 +1,135 @@
+@prefix : <http://www.example.org/academic#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+#################################################################
+#    Ontologia do domínio académico (Tema 4)
+#    Estudantes, Unidades Curriculares (UCs), Docentes e Avaliações
+#################################################################
+
+<http://www.example.org/academic> rdf:type owl:Ontology ;
+    rdfs:label "Ontologia Académica" ;
+    rdfs:comment "Ontologia para representar conhecimento sobre estudantes, UCs, docentes, cursos e avaliações." .
+
+#################################################################
+#    Classes
+#################################################################
+
+:Pessoa rdf:type owl:Class ;
+    rdfs:label "Pessoa" .
+
+:Estudante rdf:type owl:Class ;
+    rdfs:subClassOf :Pessoa ;
+    rdfs:label "Estudante" .
+
+:Docente rdf:type owl:Class ;
+    rdfs:subClassOf :Pessoa ;
+    rdfs:label "Docente" .
+
+:Curso rdf:type owl:Class ;
+    rdfs:label "Curso" .
+
+:UnidadeCurricular rdf:type owl:Class ;
+    rdfs:label "Unidade Curricular" .
+
+:Avaliacao rdf:type owl:Class ;
+    rdfs:label "Avaliação" ;
+    rdfs:comment "Representa a inscrição/avaliação de um estudante numa UC, com a respetiva nota." .
+
+:AnoLetivo rdf:type owl:Class ;
+    rdfs:label "Ano Letivo" .
+
+#################################################################
+#    Object Properties (relações entre indivíduos)
+#################################################################
+
+:temNome rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Pessoa ;
+    rdfs:range xsd:string ;
+    rdfs:label "tem nome" .
+
+:temEmail rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Pessoa ;
+    rdfs:range xsd:string ;
+    rdfs:label "tem email" .
+
+:inscritoEm rdf:type owl:ObjectProperty ;
+    rdfs:domain :Estudante ;
+    rdfs:range :UnidadeCurricular ;
+    rdfs:label "inscrito em" .
+
+:pertenceACurso rdf:type owl:ObjectProperty ;
+    rdfs:domain :Estudante ;
+    rdfs:range :Curso ;
+    rdfs:label "pertence a curso" .
+
+:leciona rdf:type owl:ObjectProperty ;
+    rdfs:domain :Docente ;
+    rdfs:range :UnidadeCurricular ;
+    rdfs:label "leciona" .
+
+:pertenceAoCurso rdf:type owl:ObjectProperty ;
+    rdfs:domain :UnidadeCurricular ;
+    rdfs:range :Curso ;
+    rdfs:label "UC pertence ao curso" .
+
+:temPreRequisito rdf:type owl:ObjectProperty ;
+    rdfs:domain :UnidadeCurricular ;
+    rdfs:range :UnidadeCurricular ;
+    rdfs:label "tem pré-requisito" .
+
+:temAvaliacao rdf:type owl:ObjectProperty ;
+    rdfs:domain :Estudante ;
+    rdfs:range :Avaliacao ;
+    rdfs:label "tem avaliação" .
+
+:avaliaUC rdf:type owl:ObjectProperty ;
+    rdfs:domain :Avaliacao ;
+    rdfs:range :UnidadeCurricular ;
+    rdfs:label "avalia UC" .
+
+:noAnoLetivo rdf:type owl:ObjectProperty ;
+    rdfs:domain :Avaliacao ;
+    rdfs:range :AnoLetivo ;
+    rdfs:label "no ano letivo" .
+
+#################################################################
+#    Datatype Properties
+#################################################################
+
+:numeroAluno rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Estudante ;
+    rdfs:range xsd:string ;
+    rdfs:label "número de aluno" .
+
+:codigoUC rdf:type owl:DatatypeProperty ;
+    rdfs:domain :UnidadeCurricular ;
+    rdfs:range xsd:string ;
+    rdfs:label "código da UC" .
+
+:ects rdf:type owl:DatatypeProperty ;
+    rdfs:domain :UnidadeCurricular ;
+    rdfs:range xsd:integer ;
+    rdfs:label "ECTS" .
+
+:semestre rdf:type owl:DatatypeProperty ;
+    rdfs:domain :UnidadeCurricular ;
+    rdfs:range xsd:integer ;
+    rdfs:label "semestre" .
+
+:nota rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Avaliacao ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "nota" .
+
+:designacao rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Curso ;
+    rdfs:range xsd:string ;
+    rdfs:label "designação" .
+
+:anoLetivoLabel rdf:type owl:DatatypeProperty ;
+    rdfs:domain :AnoLetivo ;
+    rdfs:range xsd:string ;
+    rdfs:label "ano letivo (label)" .
