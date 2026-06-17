@@ -1,1 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grafo Académico — Web Semântica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
 
+<div class="ledger">
+
+  <header class="ledger-head">
+    <div class="stamp">
+      <span class="stamp-label">PROCESSO Nº</span>
+      <span class="stamp-id">SW-T4</span>
+    </div>
+    <div class="title-block">
+      <h1>Grafo de Conhecimento Académico</h1>
+      <p class="subtitle">Ontologia OWL · Dados RDF · Consultas SPARQL sobre estudantes, UCs, docentes e avaliações</p>
+    </div>
+    <div class="meta-block">
+      <div class="meta-row"><span>Namespace</span><code>academic#</code></div>
+      <div class="meta-row"><span>Formato</span><code>turtle (.ttl)</code></div>
+      <div class="meta-row"><span>Motor</span><code>rdflib · SPARQL 1.1</code></div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="consultas" role="tab">01 — Consultas Inteligentes</button>
+    <button class="tab" data-tab="dados" role="tab">02 — Dados do Grafo</button>
+    <button class="tab" data-tab="sparql" role="tab">03 — SPARQL Livre</button>
+    <button class="tab" data-tab="gestao" role="tab">04 — Gestão (CRUD)</button>
+  </nav>
+
+  <!-- ================= TAB 1: Consultas Inteligentes ================= -->
+  <section class="panel active" id="consultas">
+    <p class="panel-intro">
+      Consultas semânticas pré-definidas que exploram relações implícitas no grafo —
+      pré-requisitos, médias, prontidão curricular e desempenho.
+    </p>
+    <div class="query-grid" id="queryList"></div>
+    <div class="result-box" id="queryResult">
+      <div class="result-placeholder">Selecione uma consulta acima para ver os resultados.</div>
+    </div>
+  </section>
+
+  <!-- ================= TAB 2: Dados do Grafo ================= -->
+  <section class="panel" id="dados">
+    <p class="panel-intro">Listagem direta das instâncias representadas no grafo RDF.</p>
+
+    <div class="data-section">
+      <h2><span class="idx">2.1</span> Estudantes</h2>
+      <table id="tblEstudantes"><thead><tr><th>Nº Aluno</th><th>Nome</th><th>Email</th><th>Curso</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <div class="data-section">
+      <h2><span class="idx">2.2</span> Unidades Curriculares</h2>
+      <table id="tblUCs"><thead><tr><th>Código</th><th>Nome</th><th>ECTS</th><th>Semestre</th><th>Curso</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <div class="data-section">
+      <h2><span class="idx">2.3</span> Docentes</h2>
+      <table id="tblDocentes"><thead><tr><th>Nome</th><th>Email</th><th>UCs lecionadas</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <div class="data-section">
+      <h2><span class="idx">2.4</span> Avaliações</h2>
+      <table id="tblAvaliacoes"><thead><tr><th>Estudante</th><th>UC</th><th>Nota</th><th>Ano Letivo</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <!-- ================= TAB 3: SPARQL Livre ================= -->
+  <section class="panel" id="sparql">
+    <p class="panel-intro">Escreva e execute a sua própria consulta SPARQL sobre o grafo (SELECT / ASK).</p>
+    <textarea id="sparqlInput" rows="10" spellcheck="false">PREFIX : <http://www.example.org/academic#>
+SELECT ?nome ?numero
+WHERE {
+  ?estudante a :Estudante ;
+             :temNome ?nome ;
+             :numeroAluno ?numero .
+}
+ORDER BY ?nome</textarea>
+    <button class="btn" id="runSparql">Executar consulta</button>
+    <div class="result-box" id="sparqlResult">
+      <div class="result-placeholder">O resultado da consulta aparece aqui.</div>
+    </div>
+  </section>
+
+  <!-- ================= TAB 4: Gestão (CRUD) ================= -->
+  <section class="panel" id="gestao">
+    <p class="panel-intro">Operações de escrita sobre o grafo: adicionar novos registos académicos.</p>
+
+    <div class="form-grid">
+
+      <form class="card-form" id="formEstudante">
+        <h2><span class="idx">4.1</span> Novo Estudante</h2>
+        <label>Número de aluno <input type="text" name="numeroAluno" required placeholder="20230004"></label>
+        <label>Nome <input type="text" name="nome" required placeholder="Nome completo"></label>
+        <label>Email <input type="email" name="email" placeholder="opcional@exemplo.pt"></label>
+        <label>Curso
+          <select name="cursoUri" id="cursoSelectEstudante"></select>
+        </label>
+        <button class="btn" type="submit">Adicionar estudante</button>
+        <div class="form-msg"></div>
+      </form>
+
+      <form class="card-form" id="formAvaliacao">
+        <h2><span class="idx">4.2</span> Nova Avaliação</h2>
+        <label>Número de aluno <input type="text" name="numeroAluno" required placeholder="20230001"></label>
+        <label>Código da UC <input type="text" name="codigoUC" required placeholder="ex: BD101"></label>
+        <label>Nota <input type="number" name="nota" step="0.1" min="0" max="20" required></label>
+        <label>Ano letivo <input type="text" name="anoLetivo" placeholder="2025/2026"></label>
+        <button class="btn" type="submit">Registar avaliação</button>
+        <div class="form-msg"></div>
+      </form>
+
+      <form class="card-form" id="formUC">
+        <h2><span class="idx">4.3</span> Nova Unidade Curricular</h2>
+        <label>Código <input type="text" name="codigo" required placeholder="ex: SI501"></label>
+        <label>Nome <input type="text" name="nome" required placeholder="Nome da UC"></label>
+        <label>ECTS <input type="number" name="ects" required min="1" max="30" value="6"></label>
+        <label>Semestre <input type="number" name="semestre" required min="1" max="2" value="1"></label>
+        <label>Curso
+          <select name="cursoUri" id="cursoSelectUC"></select>
+        </label>
+        <button class="btn" type="submit">Adicionar UC</button>
+        <div class="form-msg"></div>
+      </form>
+
+    </div>
+  </section>
+
+  <footer class="ledger-foot">
+    <span>Tema 4 — Web Semântica Académica</span>
+    <span class="dot">·</span>
+    <span>API REST + SPARQL endpoint</span>
+  </footer>
+
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
