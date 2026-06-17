@@ -1,1 +1,177 @@
+@prefix : <http://www.example.org/academic#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+#################################################################
+#    Cursos
+#################################################################
+
+:Curso_LEI rdf:type :Curso ;
+    :designacao "Licenciatura em Engenharia Informática" .
+
+:Curso_LCD rdf:type :Curso ;
+    :designacao "Licenciatura em Ciência de Dados" .
+
+#################################################################
+#    Anos Letivos
+#################################################################
+
+:AnoLetivo_2024_2025 rdf:type :AnoLetivo ;
+    :anoLetivoLabel "2024/2025" .
+
+:AnoLetivo_2025_2026 rdf:type :AnoLetivo ;
+    :anoLetivoLabel "2025/2026" .
+
+#################################################################
+#    Unidades Curriculares
+#################################################################
+
+:UC_BD rdf:type :UnidadeCurricular ;
+    :codigoUC "BD101" ;
+    rdf:type :UnidadeCurricular ;
+    :ects 6 ;
+    :semestre 1 ;
+    :pertenceAoCurso :Curso_LEI ;
+    :temNome "Bases de Dados" .
+
+:UC_WS rdf:type :UnidadeCurricular ;
+    :codigoUC "WS201" ;
+    :ects 6 ;
+    :semestre 2 ;
+    :pertenceAoCurso :Curso_LEI ;
+    :temPreRequisito :UC_BD ;
+    :temNome "Web Semântica" .
+
+:UC_POO rdf:type :UnidadeCurricular ;
+    :codigoUC "POO101" ;
+    :ects 6 ;
+    :semestre 1 ;
+    :pertenceAoCurso :Curso_LEI ;
+    :temNome "Programação Orientada a Objetos" .
+
+:UC_AS rdf:type :UnidadeCurricular ;
+    :codigoUC "AS301" ;
+    :ects 6 ;
+    :semestre 2 ;
+    :pertenceAoCurso :Curso_LEI ;
+    :temPreRequisito :UC_BD ;
+    :temPreRequisito :UC_POO ;
+    :temNome "Arquitetura de Sistemas" .
+
+:UC_ML rdf:type :UnidadeCurricular ;
+    :codigoUC "ML401" ;
+    :ects 6 ;
+    :semestre 1 ;
+    :pertenceAoCurso :Curso_LCD ;
+    :temPreRequisito :UC_BD ;
+    :temNome "Machine Learning" .
+
+#################################################################
+#    Docentes
+#################################################################
+
+:Docente_AnaCosta rdf:type :Docente ;
+    :temNome "Ana Costa" ;
+    :temEmail "ana.costa@exemplo.pt" ;
+    :leciona :UC_BD ;
+    :leciona :UC_WS .
+
+:Docente_JoaoSilva rdf:type :Docente ;
+    :temNome "João Silva" ;
+    :temEmail "joao.silva@exemplo.pt" ;
+    :leciona :UC_POO ;
+    :leciona :UC_AS .
+
+:Docente_MariaLima rdf:type :Docente ;
+    :temNome "Maria Lima" ;
+    :temEmail "maria.lima@exemplo.pt" ;
+    :leciona :UC_ML .
+
+#################################################################
+#    Estudantes
+#################################################################
+
+:Estudante_PedroAlves rdf:type :Estudante ;
+    :temNome "Pedro Alves" ;
+    :temEmail "pedro.alves@exemplo.pt" ;
+    :numeroAluno "20230001" ;
+    :pertenceACurso :Curso_LEI ;
+    :inscritoEm :UC_BD ;
+    :inscritoEm :UC_WS ;
+    :inscritoEm :UC_POO .
+
+:Estudante_RitaFerreira rdf:type :Estudante ;
+    :temNome "Rita Ferreira" ;
+    :temEmail "rita.ferreira@exemplo.pt" ;
+    :numeroAluno "20230002" ;
+    :pertenceACurso :Curso_LEI ;
+    :inscritoEm :UC_BD ;
+    :inscritoEm :UC_POO ;
+    :inscritoEm :UC_AS .
+
+:Estudante_TiagoMartins rdf:type :Estudante ;
+    :temNome "Tiago Martins" ;
+    :temEmail "tiago.martins@exemplo.pt" ;
+    :numeroAluno "20230003" ;
+    :pertenceACurso :Curso_LCD ;
+    :inscritoEm :UC_BD ;
+    :inscritoEm :UC_ML .
+
+#################################################################
+#    Avaliações
+#################################################################
+
+:Avaliacao_001 rdf:type :Avaliacao ;
+    :avaliaUC :UC_BD ;
+    :noAnoLetivo :AnoLetivo_2024_2025 ;
+    :nota 16.5 .
+
+:Avaliacao_002 rdf:type :Avaliacao ;
+    :avaliaUC :UC_WS ;
+    :noAnoLetivo :AnoLetivo_2025_2026 ;
+    :nota 14.0 .
+
+:Avaliacao_003 rdf:type :Avaliacao ;
+    :avaliaUC :UC_POO ;
+    :noAnoLetivo :AnoLetivo_2024_2025 ;
+    :nota 18.0 .
+
+:Avaliacao_004 rdf:type :Avaliacao ;
+    :avaliaUC :UC_BD ;
+    :noAnoLetivo :AnoLetivo_2024_2025 ;
+    :nota 12.5 .
+
+:Avaliacao_005 rdf:type :Avaliacao ;
+    :avaliaUC :UC_POO ;
+    :noAnoLetivo :AnoLetivo_2024_2025 ;
+    :nota 10.0 .
+
+:Avaliacao_006 rdf:type :Avaliacao ;
+    :avaliaUC :UC_AS ;
+    :noAnoLetivo :AnoLetivo_2025_2026 ;
+    :nota 15.0 .
+
+:Avaliacao_007 rdf:type :Avaliacao ;
+    :avaliaUC :UC_BD ;
+    :noAnoLetivo :AnoLetivo_2024_2025 ;
+    :nota 17.0 .
+
+:Avaliacao_008 rdf:type :Avaliacao ;
+    :avaliaUC :UC_ML ;
+    :noAnoLetivo :AnoLetivo_2025_2026 ;
+    :nota 19.0 .
+
+#################################################################
+#    Ligação Estudante -> Avaliação
+#################################################################
+
+:Estudante_PedroAlves :temAvaliacao :Avaliacao_001 .
+:Estudante_PedroAlves :temAvaliacao :Avaliacao_002 .
+:Estudante_PedroAlves :temAvaliacao :Avaliacao_003 .
+
+:Estudante_RitaFerreira :temAvaliacao :Avaliacao_004 .
+:Estudante_RitaFerreira :temAvaliacao :Avaliacao_005 .
+:Estudante_RitaFerreira :temAvaliacao :Avaliacao_006 .
+
+:Estudante_TiagoMartins :temAvaliacao :Avaliacao_007 .
+:Estudante_TiagoMartins :temAvaliacao :Avaliacao_008 .
